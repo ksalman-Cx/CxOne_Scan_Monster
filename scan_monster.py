@@ -8,7 +8,7 @@ import time
 import logging
 
 # Global variables
-base_url = None
+base_url = ast.checkmarx.net
 tenant_name = None
 auth_url = None
 iam_base_url = None

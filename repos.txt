@@ -1,5 +1,4 @@
 https://github.com/snoopysecurity/dvws
-https://github.com/snoopysecurity/dvws
 https://github.com/Checkmarx/Goatlin
 https://github.com/htbridge/pivaa
 https://github.com/snoopysecurity/dvws-node

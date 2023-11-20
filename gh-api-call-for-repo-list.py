@@ -68,7 +68,7 @@ def write_to_file(repositories):
 
 def main():
     # Set the thresholds for stars and forks, and the limit of repositories
-    stars_threshold = 1000
+    stars_threshold = 10000
     forks_threshold = 500
     limit = 100
 

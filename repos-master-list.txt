@@ -1,20 +1,3 @@
-# Can't Scan
-#"https://github.com/colloquy/colloquy",
-#"https://github.com/graphile/postgraphile",
-#"https://github.com/grafana/grafana",
-#"https://github.com/etcd-io/etcd",
-#"https://github.com/hashicorp/vault",
-#"https://github.com/h5bp/html5-boilerplate",
-#"https://github.com/IdentityServer/IdentityServer4",
-#"https://github.com/ansible/awx",
-#"https://github.com/OpenRA/OpenRA",
-#"https://github.com/jef/streetmerchant",
-#"https://github.com/YAFNET/YAFNET",
-#"https://github.com/MarimerLLC/csla",
-#"https://github.com/coreui/coreui-free-bootstrap-admin-template",
-#"https://github.com/Chocobozzz/PeerTube",
-
-
 # 0-10k
 "https://github.com/snoopysecurity/dvws",
 "https://github.com/Checkmarx/Goatlin",

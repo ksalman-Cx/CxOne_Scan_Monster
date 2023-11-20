@@ -1,11 +1,13 @@
 import requests
-import random
+from datetime import datetime, timedelta
 
-def get_popular_repositories(limit=50):
+def get_repositories_by_criteria(stars_threshold=1000, forks_threshold=500, limit=100):
     """
-    Retrieve a list of popular GitHub repositories based on specified criteria.
+    Retrieve a list of GitHub repositories based on specified star and fork criteria.
 
     Parameters:
+    - stars_threshold (int): Minimum number of stars.
+    - forks_threshold (int): Minimum number of forks.
     - limit (int): Maximum number of repositories to retrieve.
 
     Returns:
@@ -13,10 +15,10 @@ def get_popular_repositories(limit=50):
     """
     url = "https://api.github.com/search/repositories"
     params = {
-        'q': 'stars:>100000 size:<100000',  # Adjust the star count as needed
+        'q': f'stars:>{stars_threshold} forks:>{forks_threshold}',
         'sort': 'stars',
         'order': 'desc',
-        'per_page': 100  # Request a maximum of 100 repositories per page
+        'per_page': limit
     }
 
     headers = {
@@ -27,10 +29,7 @@ def get_popular_repositories(limit=50):
         response = requests.get(url, params=params, headers=headers)
         response.raise_for_status()  # Raise an HTTPError for bad responses
         repositories = response.json().get('items', [])
-        
-        # Shuffle the list of repositories and select the first 'limit' number
-        random.shuffle(repositories)
-        return repositories[:limit]
+        return repositories
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
         return []
@@ -44,23 +43,49 @@ def print_repository_details(repo):
     """
     print(f"\nRepository: {repo['full_name']}")
     print(f"Stars: {repo['stargazers_count']}")
-    print(f"Lines of Code: {repo['size']}")
+    print(f"Forks: {repo['forks_count']}")
+    print(f"Watchers: {repo['watchers_count']}")
+    print(f"Issues: {repo['open_issues_count']}")
+    print(f"Pull Requests: {repo['pulls_url'].replace('{/number}', '')}")
+    print(f"Contributors: {repo['contributors_url']}")
+    print(f"License: {repo['license']['name'] if repo['license'] else 'None'}")
+    print(f"Last Commit: {datetime.strptime(repo['pushed_at'], '%Y-%m-%dT%H:%M:%SZ')}")
     print(f"URL: http://github.com/{repo['full_name']}")
     print("-" * 50)
 
+def write_to_file(repositories):
+    """
+    Write GitHub URLs to a file.
+
+    Parameters:
+    - repositories (list): List of GitHub repositories.
+    """
+    with open("repos.txt", "w") as file:
+        for repo in repositories:
+            file.write(f"http://github.com/{repo['full_name']}\n")
+
 def main():
-    # Set a maximum limit of 50 repositories
-    limit = 50
-    repositories = get_popular_repositories(limit)
+    # Set the thresholds for stars and forks, and the limit of repositories
+    stars_threshold = 1000
+    forks_threshold = 500
+    limit = 100
+
+    # Get repositories based on criteria
+    repositories = get_repositories_by_criteria(stars_threshold=stars_threshold, forks_threshold=forks_threshold, limit=limit)
 
     total_repos = len(repositories)
-    total_loc = sum(repo['size'] for repo in repositories)
-    total_stars = sum(repo['stargazers_count'] for repo in repositories)
 
-    print(f"Collected {total_repos} random repositories with a total of {total_loc} lines of code and {total_stars} stars.")
+    if total_repos > 0:
+        print(f"Collected {total_repos} repositories with stars > {stars_threshold} and forks > {forks_threshold}.")
 
-    for repo in sorted(repositories, key=lambda x: x['size']):
-        print_repository_details(repo)
+        for repo in repositories:
+            print_repository_details(repo)
+
+        # Write GitHub URLs to 'repos.txt'
+        write_to_file(repositories)
+        print("GitHub URLs written to 'repos.txt'.")
+    else:
+        print(f"No repositories found with stars > {stars_threshold} and forks > {forks_threshold}.")
 
 if __name__ == "__main__":
     main()

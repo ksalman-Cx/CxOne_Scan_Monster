@@ -31,8 +31,8 @@ def get_most_popular_npm_packages(last_days=30, limit=10):
 
 if __name__ == "__main__":
     # Set the number of days and the limit of packages
-    last_days = 30
-    limit = 10
+    last_days = 7
+    limit = 100
 
     # Get the most popular NPM packages in the last 30 days
     packages = get_most_popular_npm_packages(last_days=last_days, limit=limit)

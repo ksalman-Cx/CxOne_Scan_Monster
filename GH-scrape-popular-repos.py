@@ -1,48 +1,89 @@
 import requests
+from datetime import datetime, timedelta
 
-def get_owasp_top_repositories(limit=25):
-    url = "https://api.github.com/orgs/OWASP/repos"
+def get_repositories_by_criteria(stars_threshold=1000, limit=100):
+    """
+    Retrieve a list of GitHub repositories based on specified star criteria.
+
+    Parameters:
+    - stars_threshold (int): Minimum number of stars.
+    - limit (int): Maximum number of repositories to retrieve.
+
+    Returns:
+    - list: List of GitHub repositories.
+    """
+    url = "https://api.github.com/search/repositories"
     params = {
-        'per_page': 100,  # You can adjust this based on the organization's repository count
-        'type': 'public'  # Only include public repositories
+        'q': f'stars:>{stars_threshold}',
+        'sort': 'stars',
+        'order': 'desc',
+        'per_page': limit
+    }
+
+    headers = {
+        'Accept': 'application/vnd.github.v3+json'
     }
 
     try:
-        response = requests.get(url, params=params)
+        response = requests.get(url, params=params, headers=headers)
         response.raise_for_status()  # Raise an HTTPError for bad responses
-        repositories = response.json()
-
-        # Filter out private repositories
-        public_repositories = [repo for repo in repositories if not repo.get('private')]
-
-        # Sort public repositories by stars in descending order
-        sorted_repositories = sorted(public_repositories, key=lambda x: x['stargazers_count'], reverse=True)
-
-        # Select the top 'limit' repositories
-        top_repositories = sorted_repositories[:limit]
-
-        return top_repositories
+        repositories = response.json().get('items', [])[:20]  # Take the top 20 repositories by stars
+        return repositories
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
         return []
 
+def print_repository_details(repo):
+    """
+    Print details of a GitHub repository.
+
+    Parameters:
+    - repo (dict): GitHub repository details.
+    """
+    print(f"\nRepository: {repo['full_name']}")
+    print(f"Stars: {repo['stargazers_count']}")
+    print(f"Forks: {repo['forks_count']}")
+    print(f"Watchers: {repo['watchers_count']}")
+    print(f"Issues: {repo['open_issues_count']}")
+    print(f"Pull Requests: {repo['pulls_url'].replace('{/number}', '')}")
+    print(f"Contributors: {repo['contributors_url']}")
+    print(f"License: {repo['license']['name'] if repo['license'] else 'None'}")
+    print(f"Last Commit: {datetime.strptime(repo['pushed_at'], '%Y-%m-%dT%H:%M:%SZ')}")
+    print(f"URL: http://github.com/{repo['full_name']}")
+    print("-" * 50)
+
 def write_to_file(repositories):
-    with open("OWASP-repos.txt", "w") as file:
+    """
+    Write GitHub URLs to a file.
+
+    Parameters:
+    - repositories (list): List of GitHub repositories.
+    """
+    with open("gh-scrape-top-20-repos.txt", "w") as file:
         for repo in repositories:
-            file.write(f"{repo['html_url']}\n")
+            file.write(f"http://github.com/{repo['full_name']}\n")
 
 def main():
-    top_repositories = get_owasp_top_repositories()
+    # Set the threshold for stars and the limit of repositories
+    stars_threshold = 1000
+    limit = 100
 
-    if top_repositories:
-        print(f"Collected {len(top_repositories)} top public repositories from OWASP by stars.")
+    # Get repositories based on criteria
+    repositories = get_repositories_by_criteria(stars_threshold=stars_threshold, limit=limit)
 
-        # Write repository URLs to file
-        write_to_file(top_repositories)
+    total_repos = len(repositories)
 
-        print("Repository URLs written to 'OWASP-repos.txt'.")
+    if total_repos > 0:
+        print(f"Collected {total_repos} repositories with stars > {stars_threshold}.")
+
+        for repo in repositories:
+            print_repository_details(repo)
+
+        # Write GitHub URLs to 'gh-scrape-top-20-repos.txt'
+        write_to_file(repositories)
+        print("GitHub URLs written to 'gh-scrape-top-20-repos.txt'.")
     else:
-        print("No public repositories found for OWASP.")
+        print(f"No repositories found with stars > {stars_threshold}.")
 
 if __name__ == "__main__":
     main()

@@ -25,7 +25,7 @@ jobs:
         pip install requests
 
     - name: Run Python script
-      run: python gh-scrape-popular-repos.py
+      run: python GH-scrape-popular-repos.py
 
     - name: Upload gh-scrape-top-20-repos.txt as artifact
       uses: actions/upload-artifact@v2

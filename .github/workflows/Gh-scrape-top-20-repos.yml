@@ -1,4 +1,4 @@
-name: Run Python Script to get latest top 20 GH repos and write to repos.txt file
+name: Run PythonScript to get latest top 20 GH repos and write to repos.txt file
    
 on:
   schedule:

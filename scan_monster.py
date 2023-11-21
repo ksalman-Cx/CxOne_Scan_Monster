@@ -233,6 +233,7 @@ def create_project(project_name, repo_url, main_branch):
         "origin": "ScanMonster",
         "tags": {
             "ScanMonster": ""
+            "OWASP": ""
         },
         "criticality": 3
     }

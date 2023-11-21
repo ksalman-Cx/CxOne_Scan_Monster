@@ -1,6 +1,6 @@
 import requests
 
-def get_owasp_repositories():
+def get_owasp_top_repositories(limit=25):
     url = "https://api.github.com/orgs/OWASP/repos"
     params = {
         'per_page': 100,  # You can adjust this based on the organization's repository count
@@ -10,7 +10,14 @@ def get_owasp_repositories():
         response = requests.get(url, params=params)
         response.raise_for_status()  # Raise an HTTPError for bad responses
         repositories = response.json()
-        return repositories
+
+        # Sort repositories by stars in descending order
+        sorted_repositories = sorted(repositories, key=lambda x: x['stargazers_count'], reverse=True)
+
+        # Select the top 'limit' repositories
+        top_repositories = sorted_repositories[:limit]
+
+        return top_repositories
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
         return []
@@ -21,13 +28,13 @@ def write_to_file(repositories):
             file.write(f"{repo['html_url']}\n")
 
 def main():
-    repositories = get_owasp_repositories()
+    top_repositories = get_owasp_top_repositories()
 
-    if repositories:
-        print(f"Collected {len(repositories)} repositories from OWASP.")
+    if top_repositories:
+        print(f"Collected {len(top_repositories)} top repositories from OWASP by stars.")
 
         # Write repository URLs to file
-        write_to_file(repositories)
+        write_to_file(top_repositories)
 
         print("Repository URLs written to 'OWASP-repos.txt'.")
     else:

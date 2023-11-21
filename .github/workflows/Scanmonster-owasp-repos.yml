@@ -1,4 +1,4 @@
-name: Scanmonster scan
+name: Scanmonster scan on all OWASP GH Repos
 
 on:
   workflow_dispatch:

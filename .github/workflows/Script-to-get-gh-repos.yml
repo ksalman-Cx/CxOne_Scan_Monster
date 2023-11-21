@@ -1,7 +1,10 @@
-name: Run Python Script
-
+name: Run Python Script to get latest top 20 GH repos and write to repos.txt file
+   
 on:
+  schedule:
+    - cron: '0 7 * * 1'  # 7 AM UTC every Monday
   workflow_dispatch:
+
 
 jobs:
   run_script:
@@ -50,7 +53,7 @@ jobs:
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v3
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.GITHUB_SECRET }}
         branch: RepoUpdatePR
         base: main
         title: "Update repositories from GitHub Actions"

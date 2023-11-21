@@ -25,13 +25,13 @@ jobs:
         pip install requests
 
     - name: Run Python script
-      run: python gh-api-call-for-repo-list.py
+      run: python gh-scrape-popular-repos.py
 
-    - name: Upload repos.txt as artifact
+    - name: Upload gh-scrape-top-20-repos.txt as artifact
       uses: actions/upload-artifact@v2
       with:
-        name: repos
-        path: repos.txt
+        name: gh-scrape-top-20-repos
+        path: gh-scrape-top-20-repos.txt
 
     - name: Configure Git
       run: |
@@ -42,19 +42,19 @@ jobs:
       run: git checkout -B RepoUpdatePR origin/main
 
     - name: Apply changes from repos.txt
-      run: cat repos.txt >> repos_from_action.txt  # Append the contents of repos.txt to an existing file (replace with your logic)
+      run: cat gh-scrape-top-20-repos.txt >> repos_from_action.txt  # Append the contents of repos.txt to an existing file (replace with your logic)
 
     - name: Commit and push changes
       run: |
         git add repos_from_action.txt
         git commit -m "Update repositories from GitHub Actions"
-        git push origin RepoUpdatePR
+        git push origin GH-Top-20-Repo-List-Update-PR
 
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v3
       with:
         token: ${{ secrets.GITHUB_SECRET }}
-        branch: RepoUpdatePR
+        branch: GH-Top-20-Repo-List-Update-PR
         base: main
         title: "Update repositories from GitHub Actions"
         body: "This pull request updates the repositories from the GitHub Actions workflow."
